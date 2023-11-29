@@ -18,12 +18,11 @@ class OccupancyGridMap : public grid_map::GridMap
 {
   const float OCCUPIED = 1.0;
   const float FREE = 0.0;
-  const float UNKNOWN = -1.0;
+  const float UNKNOWN = NAN;
 
 public:
   /// @brief
   OccupancyGridMap();
-  OccupancyGridMap& operator=(const OccupancyGridMap& other);
 
   grid_map::GridMap::Matrix& getOccupancyLayer();
   const grid_map::GridMap::Matrix& getOccupancyLayer() const;
@@ -43,6 +42,7 @@ public:
 
   float getDistance(const grid_map::Index& grid_index1, const grid_map::Index& grid_index2) const;
   grid_map::CircleIterator getCircleIterator(const grid_map::Index& query_index, double radius) const;
+  grid_map::SubmapIterator getSquareIterator(const grid_map::Index& query_index, int search_length) const;
 };
 
 #endif  // OCCUPANCY_GRID_MAP_H
