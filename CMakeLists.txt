@@ -14,7 +14,7 @@ catkin_package(
   INCLUDE_DIRS 
     include
   LIBRARIES 
-    # ${PROJECT_NAME}_library
+    occupancy_grid_map
   CATKIN_DEPENDS
     roscpp
     grid_map_core
