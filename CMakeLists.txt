@@ -26,6 +26,7 @@ catkin_package(
 ###########
 ## Build ##
 ###########
+set(CMAKE_BUILD_TYPE Release)
 
 include_directories(
   include
