@@ -42,43 +42,45 @@ void OccupancyGridMapHelper::applyBinaryThreshold(double free_thres, double occu
 bool OccupancyGridMapHelper::getInflatedMap(const OccupancyGridMap& map, double inflation_radius,
                                             OccupancyGridMap& map_with_inflation)
 {
-  if (std::abs(inflation_radius) < DBL_EPSILON)
+  // Check validity of inflaton radius
+  if (std::abs(inflation_radius) < std::numeric_limits<double>::epsilon())
     return false;
+
+  // Align map geometry
+  map_with_inflation.setGeometry(map.getLength(), map.getResolution());
 
   // Copy occupancy values to buffered occupancy layer
   const auto& occupancy_layer = map.getOccupancyLayer();
-  map_with_inflation.getOccupancyLayer() = map.getOccupancyLayer();
+  map_with_inflation.getOccupancyLayer() = grid_map::GridMap::Matrix(map.getOccupancyLayer());
 
   // save occupied indices in the map
   std::queue<grid_map::Index> occupied_indices;
-  for (grid_map::GridMapIterator iter(map); !iter.isPastEnd(); ++iter)
+  for (grid_map::GridMapIterator iterator(map); !iterator.isPastEnd(); ++iterator)
   {
-    const auto& grid_index = *iter;
-    if (!map.isValid(grid_index))  // skip empty cell (NaN)
+    if (map.isUnknownAt(*iterator))  // skip empty cell (NaN)
       continue;
 
-    if (map.isFreeAt(grid_index))
+    if (map.isFreeAt(*iterator))
       continue;
 
-    occupied_indices.push(grid_index);
+    occupied_indices.push(*iterator);
   }
 
   // make new occupied area to the map_with_inflation
   while (!occupied_indices.empty())
   {
     const auto& occupied_index = occupied_indices.front();
-    const auto& occupied = occupancy_layer(occupied_index(0), occupied_index(1));
+    const auto& occupied = occupancy_layer(occupied_index.x(), occupied_index.y());
 
-    grid_map::CircleIterator iter = map_with_inflation.getCircleIterator(occupied_index, inflation_radius);
-    for (iter; !iter.isPastEnd(); ++iter)
+    grid_map::CircleIterator iterator = map_with_inflation.getCircleIterator(occupied_index, inflation_radius);
+    for (iterator; !iterator.isPastEnd(); ++iterator)
     {
-      const auto& index_to_be_occupied = *iter;
+      const auto& index_to_be_occupied = *iterator;
 
       if (map_with_inflation.isOutOfBoundaryAt(index_to_be_occupied))
         continue;
 
-      auto& grid_state = map_with_inflation.at("occupancy", index_to_be_occupied);
-      grid_state = occupied;
+      map_with_inflation.at("occupancy", index_to_be_occupied) = occupied;
 
       // grid_map::Position occupied_position = map.getPositionFrom(occupied_index);
       // const auto &distanceFromObstacle = (occupied_position - position_to_be_occupied).norm();
