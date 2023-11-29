@@ -16,5 +16,5 @@ class OccupancyGridMapRosConverter
 public:
 static bool toOccupancyGridMsg(const OccupancyGridMap& occupancy_map, nav_msgs::OccupancyGrid& msg);
 
-
+static bool fromOccupancyGridMsg(const nav_msgs::OccupancyGrid& msg, OccupancyGridMap& occupancy_map);
 };

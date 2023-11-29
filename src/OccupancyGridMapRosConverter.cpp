@@ -10,3 +10,8 @@ bool OccupancyGridMapRosConverter::toOccupancyGridMsg(const OccupancyGridMap& oc
   grid_map::GridMapRosConverter::toOccupancyGrid(occupancy_map, "occupancy", min, max, msg);
   return true;
 }
+
+bool OccupancyGridMapRosConverter::fromOccupancyGridMsg(const nav_msgs::OccupancyGrid& msg, OccupancyGridMap& occupancy_map)
+{
+  return grid_map::GridMapRosConverter::fromOccupancyGrid(msg, "occupancy", occupancy_map);
+}
