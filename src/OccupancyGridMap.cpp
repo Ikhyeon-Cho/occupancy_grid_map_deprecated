@@ -5,15 +5,6 @@ OccupancyGridMap::OccupancyGridMap() : GridMap({ "occupancy" })
 {
 }
 
-OccupancyGridMap& OccupancyGridMap::operator=(const OccupancyGridMap& other)
-{
-  if (this != &other)
-  {
-    grid_map::GridMap::operator=(other);
-  }
-  return *this;
-}
-
 grid_map::GridMap::Matrix& OccupancyGridMap::getOccupancyLayer()
 {
   return get("occupancy");
@@ -59,8 +50,7 @@ bool OccupancyGridMap::isOutOfBoundaryAt(const grid_map::Index& grid_index)
 
 bool OccupancyGridMap::isOutOfBoundaryAt(const grid_map::Position& position)
 {
-  grid_map::Index idx;
-  return !getIndex(position, idx);
+  return !isInside(position);
 }
 
 bool OccupancyGridMap::isFreeAt(const grid_map::Index& grid_index) const
@@ -78,7 +68,7 @@ bool OccupancyGridMap::isOccupiedAt(const grid_map::Index& grid_index) const
 bool OccupancyGridMap::isUnknownAt(const grid_map::Index& grid_index) const
 {
   const auto& state = at("occupancy", grid_index);
-  return std::abs(state - UNKNOWN) < std::numeric_limits<float>::epsilon();
+  return !std::isfinite(state);
 }
 
 grid_map::Position OccupancyGridMap::getPositionFrom(const grid_map::Index& grid_index) const
@@ -107,4 +97,12 @@ grid_map::CircleIterator OccupancyGridMap::getCircleIterator(const grid_map::Ind
   grid_map::Position queried_position;
   this->getPosition(query_index, queried_position);
   return grid_map::CircleIterator(*this, queried_position, radius);
+}
+
+grid_map::SubmapIterator OccupancyGridMap::getSquareIterator(const grid_map::Index& query_index,
+                                                             int search_length) const
+{
+  grid_map::Index submap_start_index = query_index - grid_map::Index(search_length, search_length);
+  grid_map::Index submap_buffer_size = grid_map::Index(2 * search_length + 1, 2 * search_length + 1);
+  return grid_map::SubmapIterator(*this, submap_start_index, submap_buffer_size);
 }
