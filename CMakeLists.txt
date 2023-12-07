@@ -6,7 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   grid_map_core
   grid_map_ros
-  grid_map_msgs
+  grid_map_cv
   nav_msgs
 )
 
@@ -19,7 +19,7 @@ catkin_package(
     roscpp
     grid_map_core
     grid_map_ros
-    grid_map_msgs
+    grid_map_cv
     nav_msgs
 )
 
